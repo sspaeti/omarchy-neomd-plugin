@@ -56,7 +56,8 @@ Configure on the widget entry in `~/.config/omarchy/shell.json`:
     "defaultTab": "ToScreen",
     "limit": 15,
     "refreshMinutes": 5,
-    "jumpCommand": "~/.config/hypr/sspaeti/jump-to-email-tmux.sh"
+    "jumpCommand": "~/.config/hypr/sspaeti/jump-to-email-tmux.sh",
+    "configPath": ""
   }
 }
 ```
@@ -69,6 +70,10 @@ Configure on the widget entry in `~/.config/omarchy/shell.json`:
 - `refreshMinutes` — background poll cadence (the disk cache means an open
   is always instant)
 - `jumpCommand` — what `o` / right-click runs to open the full client
+- `configPath` — alternate neomd `config.toml`, e.g.
+  `"~/.config/neomd-demo-hostpoint/config.toml"` for a demo account during
+  screen recordings; empty uses neomd's default config. Each config gets its
+  own on-disk cache, so demo and real mail never mix.
 
 ## Mouse
 

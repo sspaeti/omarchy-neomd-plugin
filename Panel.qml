@@ -70,6 +70,16 @@ Panel {
   readonly property int refreshMinutes: Math.max(2, Number(setting("refreshMinutes", 5)) || 5)
   readonly property string jumpCommand: String(setting("jumpCommand",
     Quickshell.env("HOME") + "/.config/hypr/sspaeti/jump-to-email-tmux.sh"))
+  // Alternate neomd config.toml (e.g. a demo account for screen recordings).
+  // Empty = neomd's default config. fetch.sh keeps a separate cache per
+  // config, so switching never mixes demo and real mail.
+  readonly property string configPath: String(setting("configPath", ""))
+
+  function baseCmd() {
+    var cmd = ["bash", scriptPath()]
+    if (configPath !== "") cmd.push("--config", configPath)
+    return cmd
+  }
 
   // ---- Mail state, filled by fetch.sh (cached on disk between runs).
   property var data: null
@@ -99,7 +109,7 @@ Panel {
 
   function runFetch(cachedOk) {
     if (fetchProc.running) return
-    var cmd = ["bash", scriptPath()]
+    var cmd = baseCmd()
     if (cachedOk) cmd.push("--cached")
     cmd.push("--folders", tabNames.join(","), "--limit", String(limit))
     fetchProc.command = cmd
@@ -130,7 +140,7 @@ Panel {
     var mail = root.selected
     reading = mail
     bodyError = ""
-    var key = root.tabName + "|" + mail.uid
+    var key = root.configPath + "|" + root.tabName + "|" + mail.uid
     if (bodyCache[key] !== undefined) {
       bodyText = bodyCache[key]
       return
@@ -138,7 +148,9 @@ Panel {
     bodyText = ""
     if (readProc.running) return
     readProc.cacheKey = key
-    readProc.command = ["bash", scriptPath(), "--read", root.tabName, String(mail.uid)]
+    var cmd = baseCmd()
+    cmd.push("--read", root.tabName, String(mail.uid))
+    readProc.command = cmd
     readProc.running = true
   }
 
@@ -160,13 +172,13 @@ Panel {
             root.bodyError = Model.plainText(v.error || "could not load body")
             return
           }
-          var body = String(v.body || "")
+          var body = Model.sanitizeBody(v.body)
           if (v.truncated) body += "\n\n… (truncated — open neomd for the rest)"
           var m = {}
           for (var k in root.bodyCache) m[k] = root.bodyCache[k]
           m[readProc.cacheKey] = body
           root.bodyCache = m
-          if (root.reading && root.tabName + "|" + root.reading.uid === readProc.cacheKey)
+          if (root.reading && root.configPath + "|" + root.tabName + "|" + root.reading.uid === readProc.cacheKey)
             root.bodyText = body
         } catch (e) {
           root.bodyError = "could not parse body JSON"

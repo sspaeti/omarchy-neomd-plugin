@@ -6,6 +6,25 @@ function plainText(s) {
   return String(s == null ? "" : s).replace(/<[^>]*>/g, "")
 }
 
+// Qt's MarkdownText goes through rich text, which FETCHES and renders remote
+// ![](url) images — huge logos in the popup, and every spy pixel gets pinged.
+// The TUI (glamour) renders images as text on purpose; match that here:
+//   ![alt](url)  -> "🖼 alt"   (plain text, nothing is downloaded)
+//   ![](url)     -> removed    (no alt = decoration or tracking pixel)
+//   [![alt](img)](href) collapses to a normal [🖼 alt](href) link
+// <img> tags that survive in the markdown are stripped the same way.
+function sanitizeBody(md) {
+  return String(md == null ? "" : md)
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, function(_, alt) {
+      alt = alt.trim()
+      return alt === "" ? "" : "🖼 " + alt
+    })
+    .replace(/<img\b[^>]*\balt="([^"]+)"[^>]*>/gi, "🖼 $1")
+    .replace(/<img\b[^>]*>/gi, "")
+    // Image-only links whose image was dropped leave "[](href)" — remove.
+    .replace(/\[\s*\]\([^)]*\)/g, "")
+}
+
 // "Jane Doe <jane@example.com>" -> "Jane Doe"; bare address -> "jane"
 function senderName(from) {
   var s = String(from || "")
