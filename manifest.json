@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.sspaeti.neomd",
   "name": "neomd Mail",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Simon Späti",
   "license": "MIT",
   "description": "Calm mail peek for neomd: HEY-style Inbox / ToScreen / Feed / PaperTrail tabs behind a static icon — no unread counter on the bar, ever. Strictly read-only with an in-panel reader (BODY.PEEK).",
