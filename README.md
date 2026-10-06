@@ -9,6 +9,8 @@ that builds up while you work. Mail only exists when you click (or hit the
 hotkey). Data is polled in the background so the panel opens instantly, but
 whatever arrives, the pill stays silent.
 
+https://github.com/user-attachments/assets/a7f086f0-5848-452d-926f-6086fa782307
+
 ## What you get
 
 - **HEY-style tabs** — Inbox / ToScreen / Feed / PaperTrail, switched like
